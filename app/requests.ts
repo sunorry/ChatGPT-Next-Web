@@ -169,9 +169,10 @@ export async function requestChatStream(
     const openaiUrl = useAccessStore.getState().openaiUrl;
     let res: Response;
     if (req.model === "image-alpha-001") {
-      const prompt = req.messages.findLast(
-        (item) => item.role === "user",
-      )?.content;
+      // const prompt = req.messages.findLast(
+      //   (item) => item.role === "user",
+      // )?.content;
+      const prompt = req.messages[req.messages.length - 1]["content"];
       res = await fetch(openaiUrl + "v1/images/generations", {
         method: "POST",
         headers: {
