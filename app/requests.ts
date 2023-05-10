@@ -167,15 +167,40 @@ export async function requestChatStream(
 
   try {
     const openaiUrl = useAccessStore.getState().openaiUrl;
-    const res = await fetch(openaiUrl + "v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getHeaders(),
-      },
-      body: JSON.stringify(req),
-      signal: controller.signal,
-    });
+    let res: Response;
+    if (req.model === "image-alpha-001") {
+      console.log("image-alpha-001");
+      res = await fetch(openaiUrl + "/v1/images/generations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getHeaders(),
+        },
+        body: JSON.stringify(req),
+        signal: controller.signal,
+      });
+      console.log(res);
+    } else {
+      res = await fetch(openaiUrl + "v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getHeaders(),
+        },
+        body: JSON.stringify(req),
+        signal: controller.signal,
+      });
+    }
+
+    // const res = await fetch(openaiUrl + "v1/chat/completions", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     ...getHeaders(),
+    //   },
+    //   body: JSON.stringify(req),
+    //   signal: controller.signal,
+    // });
 
     clearTimeout(reqTimeoutId);
 
