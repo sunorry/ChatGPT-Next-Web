@@ -169,17 +169,23 @@ export async function requestChatStream(
     const openaiUrl = useAccessStore.getState().openaiUrl;
     let res: Response;
     if (req.model === "image-alpha-001") {
-      console.log("image-alpha-001");
-      res = await fetch(openaiUrl + "/v1/images/generations", {
+      const prompt = req.messages.findLast(
+        (item) => item.role === "user",
+      )?.content;
+      res = await fetch(openaiUrl + "v1/images/generations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...getHeaders(),
         },
-        body: JSON.stringify(req),
+        body: JSON.stringify({
+          model: "image-alpha-001",
+          prompt: prompt,
+          n: 1,
+          size: "1024x1024",
+        }),
         signal: controller.signal,
       });
-      console.log(res);
     } else {
       res = await fetch(openaiUrl + "v1/chat/completions", {
         method: "POST",
@@ -229,8 +235,12 @@ export async function requestChatStream(
         const text = decoder.decode(content.value, { stream: true });
         responseText += text;
 
-        const done = content.done;
-        options?.onMessage(responseText, false);
+        if (req.model === "image-alpha-001") {
+          responseText = `![](${JSON.parse(responseText).data[0]["url"]})`;
+        }
+
+        const done = req.model === "image-alpha-001" ? true : content.done;
+        options?.onMessage(responseText, done);
 
         if (done) {
           break;

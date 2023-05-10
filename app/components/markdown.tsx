@@ -85,6 +85,10 @@ export function PreCode(props: { children: any }) {
   );
 }
 
+const imageRenderer = ({ src }: any) => {
+  return <img src={src} className="img-fluid" referrerPolicy="no-referrer" />;
+};
+
 function _MarkDownContent(props: { content: string }) {
   return (
     <ReactMarkdown
@@ -101,6 +105,7 @@ function _MarkDownContent(props: { content: string }) {
       ]}
       components={{
         pre: PreCode,
+        img: imageRenderer,
         a: (aProps) => {
           const href = aProps.href || "";
           const isInternal = /^\/#/i.test(href);
@@ -108,6 +113,7 @@ function _MarkDownContent(props: { content: string }) {
           return <a {...aProps} target={target} />;
         },
       }}
+      linkTarget={"_blank"}
     >
       {props.content}
     </ReactMarkdown>
